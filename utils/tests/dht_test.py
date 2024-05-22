@@ -1,4 +1,13 @@
-from ..sensors.dht11_interface import DHTSensor
+import sys
+import os
+print("Current sys.path:")
+for path in sys.path:
+	print(path)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+print("Current sys.path2:")
+for path in sys.path:
+        print(path)
+from utils.sensors.dht11_interface import DHTSensor
 
 def dht_test():
 	#Instantiate DHTSensor object using pi GPIO 17 here
@@ -10,8 +19,8 @@ def dht_test():
 	#Display read data
 	if success:
 		#{:.if} placeholder string replaced with arg floating point number to one decimal
-		print("Temperature: {.if}°C".format(temperature))
-		print("Humidity: {:.if} %".format(humidity))
+		print("Temperature: {:.1f}°C".format(temperature))
+		print("Humidity: {:.1f}%".format(humidity))
 	else:
 		print("Failed to read sensor data")
 if __name__ == "__main__":
