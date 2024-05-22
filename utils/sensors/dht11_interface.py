@@ -8,6 +8,8 @@ import RPi.GPIO as GPIO
 class DHTSensor:
 	def __init__(self, pin):
 		self.pin = pin
+		GPIO.setmode(GPIO.BCM)
+
 	def read_sensor_data(self):
 		#Some function or "method" to talk to the DHT
 

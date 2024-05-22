@@ -1,12 +1,12 @@
 import sys
 import os
-print("Current sys.path:")
-for path in sys.path:
-	print(path)
+#print("Current sys.path:")
+#for path in sys.path:
+#	print(path)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-print("Current sys.path2:")
-for path in sys.path:
-        print(path)
+#print("Current sys.path2:")
+#for path in sys.path:
+#        print(path)
 from utils.sensors.dht11_interface import DHTSensor
 
 def dht_test():
