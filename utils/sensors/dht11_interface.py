@@ -12,6 +12,14 @@ class DHTSensor:
 
 	def read_sensor_data(self):
 		#Some function or "method" to talk to the DHT
+		#Starting communication.
+#		GPIO.output(self.pin, GPIO.HIGH)
+		GPIO.setup(self.pin, GPIO.OUT)
+		GPIO.output(self.pin, GPIO.HIGH)
+
+		GPIO.output(self.pin, GPIO.LOW)
+		time.sleep(0.018)
+		GPIO.output(self.pin, GPIO.HIGH)
 
 		#Placeholder variables initialized to 0 decimals as temp/humid  56.4F etc
 		temp = 0.0
