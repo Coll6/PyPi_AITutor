@@ -1,2 +1,13 @@
 Information about DHT communication waveform.
 Used https://www.mouser.com/datasheet/2/758/DHT11-Technical-Data-Sheet-Translated-Version-1143054.pdf
+DHT-11 packet is 5 bytes in total.
+<IntegerValue HumidityHigh 8bits>-<DecimalValue HumidityLow 8bits>-<IntegerValue TempHigh 8bits>-<DecimalValue TempLow 8bits>-<Checksum>
+Checksum is calculated adding the first 4 bytes together. Byte two lower humidity reading is usually 0x00.
+Communication is started when the MCU is pulled low. Data sheet says for at least 18ms but AI keeps suggesting 18us
+
+Every bit is preceeded by a low signal. It seems that the length of the high values determine a 0 or a 1 value.
+The low values seem to be consistent for the most part. It seems the high values matter most and should be focused on.
+a 0 will have a high pulse roughly 26us-28us.
+a 1 will have a high pulse roughly 70us.  
+Ending signal will be a low as if starting another bit but will leave the line high can be checked if a high value is there after 70us.
+Length of a packet seems to be roughly 22ms counting the initial low by the MCU.
