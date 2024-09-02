@@ -23,6 +23,6 @@ def dht_test():
 		print("Temperature: {:.1f}°C".format(temperature))
 		print("Humidity: {:.1f}%".format(humidity))
 	else:
-		print("{error_message}")
+		print(f"{error_message}")
 if __name__ == "__main__":
 	dht_test()
