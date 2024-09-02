@@ -11,3 +11,5 @@ a 0 will have a high pulse roughly 26us-28us.
 a 1 will have a high pulse roughly 70us.  
 Ending signal will be a low as if starting another bit but will leave the line high can be checked if a high value is there after 70us.
 Length of a packet seems to be roughly 22ms counting the initial low by the MCU.
+Might use an interrupt method just to try it out rather than polling the gpio.
+Polling method seems to work all bits seem to show up except for the first high pulse.
