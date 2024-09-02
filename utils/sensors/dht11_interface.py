@@ -68,7 +68,7 @@ class DHTSensor:
 		temp = 0.0
 		humid = 0.0
 		
-		if not ((proc_stream[0] + proc_stream[1] + proc_stream[2] + proc_stream[3]) == proc_stream[4]):
+		if not (sum(proc_stream[:4]) == proc_stream[4]):
 			success = False
 			error_message = "Data not read properly. Checksum Failure"
 			#print(f"{proc_stream[0] + proc_stream[1] + proc_stream[2] + proc_stream[3]}={proc_stream[4]}")
