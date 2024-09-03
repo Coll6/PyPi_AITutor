@@ -73,10 +73,12 @@ class DHTSensor:
 			error_message = "Data not read properly. Checksum Failure"
 			#print(f"{proc_stream[0] + proc_stream[1] + proc_stream[2] + proc_stream[3]}={proc_stream[4]}")
 		else:
-			temp = proc_stream[2] #temp reading not sensitive enough for decimals
+			temp = proc_stream[2] + (proc_stream[3] / 10.0) #temp reading not sensitive enough for decimals but testing suggests adding it.
 			humid = proc_stream[0]
 			success = True
-
+		print("Proc Stream:", ' '.join(f'0x{byte:02X}' for byte in proc_stream))
+		print("Proc Stream:", ' '.join(str(byte) for byte in proc_stream))
+		print(f"F: {temp * (9/5) + 32}")
 		#Simulate Sensor data for testing before implementing sensor
 		#time.sleep(2) #Simulate sensor response time. Read Datasheet
 		#temp = 25.0 #Simulate temp reading
