@@ -43,7 +43,7 @@ class DHTSensor:
 		buffer = bytearray(5)
 		for i, length in enumerate(list[1:]):
 #			print(f"bit: {i + 1} and {length}")
-			bit_value = 1 if length >= 30000 else 0
+			bit_value = 1 if length >= 50000 else 0
 
 			#Calculate bit and byte position
 			byte_index = i // 8
