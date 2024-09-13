@@ -38,12 +38,14 @@ class DHTSensor:
 				print( "Read done.")
 				GPIO.setup(self.pin, GPIO.OUT)
 				GPIO.output(self.pin, GPIO.HIGH)
+				print(f"{pulse_lengths}")
+
 				return pulse_lengths
 	def process_stream(self , list):
 		buffer = bytearray(5)
 		for i, length in enumerate(list[1:]):
-#			print(f"bit: {i + 1} and {length}")
-			bit_value = 1 if length >= 50000 else 0
+			print(f"bit: {i + 1} and {round(length / 1000,2)}us") 
+			bit_value = 1 if length >= 55000 else 0
 
 			#Calculate bit and byte position
 			byte_index = i // 8
@@ -78,7 +80,7 @@ class DHTSensor:
 			success = True
 		print("Proc Stream:", ' '.join(f'0x{byte:02X}' for byte in proc_stream))
 		print("Proc Stream:", ' '.join(str(byte) for byte in proc_stream))
-		print(f"F: {temp * (9/5) + 32}")
+		print(f"F: {round(temp * (9/5) + 32,1)}")
 		#Simulate Sensor data for testing before implementing sensor
 		#time.sleep(2) #Simulate sensor response time. Read Datasheet
 		#temp = 25.0 #Simulate temp reading
