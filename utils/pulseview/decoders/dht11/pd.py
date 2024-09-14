@@ -33,9 +33,13 @@ class Decoder(srd.Decoder):
     tags = ['IC', 'Sensor']
     annotations = (
         ('start', 'Start of Communication'),
+        ('byte', 'Byte'),
+        ('byte2', 'Byte2'),
     )
     annotation_rows = (
         ('control', 'Control Signals', (0,)),  # Shows the 'start' annotation in a row called 'Control Signals'
+        ('data', 'Data', (1,)), 
+        ('data2', 'Data2', (2,)),
     )
     channels = (
         {'id': 'sda', 'name': 'SDA', 'desc': 'Single wire serial data line'},
@@ -53,7 +57,16 @@ class Decoder(srd.Decoder):
         self.samplerate = None
     def start(self):
         self.out_ann = self.register(srd.OUTPUT_ANN)
-    
+        
+    def procdata(self, bitlist, bytepos):
+        if len(bitlist) == 40:
+            for i in range(0, len(bytepos), 2):
+                strt_bit_index = (i // 2) * 8
+                end_bit_index = strt_bit_index + 8
+                sublist = bitlist[strt_bit_index:end_bit_index] 
+                bit_string = ''.join(str(bit) for bit in sublist)
+                self.put(bytepos[i], bytepos[i + 1], self.out_ann, [1, [str(int(bit_string, 2))]])
+        
     def decode(self):
         state = 'IDLE'
         samp_pin = None
@@ -110,13 +123,33 @@ class Decoder(srd.Decoder):
                     state = 'IDLE'
             elif state == 'COMS':
                 data_bits = []
-                int_samp = None
-                while len(data_bits) < 40:
-                    pins = self.wait({0: 'e'})
+                byte_loc = []
+                inter_samp = None
+                diff = None
+                #int(-(-x // 1)) used to round a number without importing the math module.
+                end_lng = int(-(-((((70 + 1) * (1 + 0.13)/1000000) * self.samplerate)) + 1 // 1))
+                while True:
+                    pins = self.wait([{0: 'e'}, {'skip': end_lng}])
                     if pins[0] == True:
-                        int_samp = self.samplenum
+                        inter_samp = self.samplenum
+                        if (inter_samp - prev_samp) > end_lng:
+                            self.put(prev_samp, self.samplenum, self.out_ann, [0, ['End Com ' + str(len(byte_loc))]])
+                            state = 'IDLE'
+                            self.procdata(data_bits, byte_loc)
+                            break
                     elif pins[0] == False:
-                        self.put(prev_samp, self.samplenum, self.out_ann, [0, ['Bit']])
+                        diff = self.samplenum - inter_samp
+                        if (((25 * (1 - 0.20)/1000000) * self.samplerate)) <= diff <= (((25 * (1 + 0.20)/1000000) * self.samplerate)):
+                            self.put(prev_samp, self.samplenum, self.out_ann, [0, ['0']])
+                            data_bits.append(0)
+                        elif (((70 * (1 - 0.10)/1000000) * self.samplerate)) <= diff <= (((70 * (1 + 0.13)/1000000) * self.samplerate)):
+                            self.put(prev_samp, self.samplenum, self.out_ann, [0, ['1']])
+                            data_bits.append(1)
+                        else:
+                            state = 'IDLE'
+                            break
+                        if len(data_bits) % 8 == 1:
+                            byte_loc.append(prev_samp)
+                        if len(data_bits) % 8 == 0:
+                            byte_loc.append(self.samplenum)
                         prev_samp = self.samplenum
-                        data_bits.append(1)
-                state = 'IDLE'
