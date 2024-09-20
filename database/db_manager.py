@@ -9,6 +9,15 @@ class DataManager:
 		self._initialize_db()
  #_signifies an internal function dont use outside class
 	def _create_tables(self, conn):
+		conn.execute("PRAGMA foreign_keys = ON;")  # Enable foreign key support
+		conn.execute("""
+			CREATE TABLE IF NOT EXISTS sources (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				source_name TEXT NOT NULL,
+				description TEXT,
+				sensor_type TEXT
+			)
+		""")
 		conn.execute("""
 			CREATE TABLE IF NOT EXISTS TempHumData (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +25,8 @@ class DataManager:
 				temperature REAL,
 				humidity REAL,
 				source TEXT,
-				sensor_id TEXT
+				source_id INTEGER,
+				FOREIGN KEY (source_id) REFERENCES sources(id)
 			)
 		 """)
 	def _is_valid_file(self, file_path):
@@ -33,14 +43,22 @@ class DataManager:
 			self._create_database(self.database)
 		else:
 			print(f'{self.database} exists using file.')
-	def insert_data(self, timestamp, temp):
+	def insert_data(self, timestamp, temp, humid, name_src, source_id):
+		with sqlite3.connect(self.database) as conn:
+			conn.execute("PRAGMA foreign_keys = ON;")  # Enable foreign key support
+			cursor = conn.cursor()
+			cursor.execute("""
+				INSERT INTO TempHumData (timestamp, temperature, humidity, source, source_id)
+				VALUES(?, ?, ?, ?, ?)
+			""", (timestamp, temp, humid, name_src, source_id))
+			conn.commit()
+			print("Data added.")
+	def add_source(self, name, descrip, type):
 		with sqlite3.connect(self.database) as conn:
 			cursor = conn.cursor()
 			cursor.execute("""
-				INSERT INTO TempHumData (timestamp, temperature)
-				VALUES(?, ?)
-			""", (timestamp, temp))
+				INSERT INTO sources (source_name, description, sensor_type)
+				VALUES (?, ?, ?)
+				""", (name, descrip, type))
 			conn.commit()
-			print("Data added.")
 
- 
