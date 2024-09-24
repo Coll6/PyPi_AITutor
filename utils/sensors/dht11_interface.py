@@ -42,6 +42,9 @@ class DHTSensor:
 
 				return pulse_lengths
 	def process_stream(self , list):
+		if list == []:
+			buffer = bytearray([0x00, 0x00, 0x00, 0x00, 0xFF])
+			return buffer
 		buffer = bytearray(5)
 		for i, length in enumerate(list[1:]):
 			print(f"bit: {i + 1} and {round(length / 1000,2)}us") 
@@ -69,10 +72,14 @@ class DHTSensor:
 		#Placeholder variables initialized to 0 decimals as temp/humid  56.4F etc
 		temp = 0.0
 		humid = 0.0
-		
+
 		if not (sum(proc_stream[:4]) == proc_stream[4]):
-			success = False
-			error_message = "Data not read properly. Checksum Failure"
+			if proc_stream == bytearray([0x00, 0x00, 0x00, 0x00, 0xFF]): #Never enters this fix.
+				success = False
+				error_message = "Unknown condition."
+			else:
+				success = False
+				error_message = "Data not read properly. Checksum Failure"
 			#print(f"{proc_stream[0] + proc_stream[1] + proc_stream[2] + proc_stream[3]}={proc_stream[4]}")
 		else:
 			temp = proc_stream[2] + (proc_stream[3] / 10.0) #temp reading not sensitive enough for decimals but testing suggests adding it.

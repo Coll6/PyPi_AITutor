@@ -13,6 +13,6 @@ class wscrape:
 			soup = BeautifulSoup(response.text, 'html.parser')
 			temp = soup.find('span', class_='TodayDetailsCard--feelsLikeTempValue--2icPt').text[:-1]
 			humid = soup.find('span', {'data-testid': 'PercentageValue'}).text[:-1]
-			return temp, humid
+			return temp, humid, True
 		else:
-			return False, False
+			return False, False, False
